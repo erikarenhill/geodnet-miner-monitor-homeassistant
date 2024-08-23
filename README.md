@@ -1,0 +1,1 @@
+# geodnet-miner-monitor-homeassistant
