@@ -3,7 +3,8 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.const import CONF_API_KEY, PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, DATA_KILOBYTES
+from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, DATA_KILOBYTES
+from .const import CONF_SERIAL_NUMBER
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers import device_registry as dr
 
@@ -12,7 +13,7 @@ from .const import DOMAIN
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     """Set up Geodnet sensors based on a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    api_key = entry.data[CONF_API_KEY]
+    api_key = entry.data[CONF_SERIAL_NUMBER]
 
     sensors = [
         GeodnetSensor(coordinator, "effective_satellites", api_key),
