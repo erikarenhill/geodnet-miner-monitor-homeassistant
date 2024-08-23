@@ -15,9 +15,14 @@ Before installing this integration, you need to set up the Geodnet Headless Cons
 ### HACS (Recommended)
 
 1. Ensure that [HACS](https://hacs.xyz/) is installed.
-2. Search for "Geodnet" in the HACS "Integrations" tab.
-3. Install the Geodnet integration.
-4. Restart Home Assistant.
+2. Add this repository as a custom repository in HACS:
+   - In HACS, click on the three dots in the top right corner and select "Custom repositories".
+   - Enter the URL of this repository: `https://github.com/erikarenhill/geodnet-miner-monitor-homeassistant`
+   - Select "Integration" as the category.
+   - Click "Add".
+3. Search for "Geodnet" in the HACS "Integrations" tab.
+4. Install the Geodnet integration.
+5. Restart Home Assistant.
 
 ### Manual Installation
 
