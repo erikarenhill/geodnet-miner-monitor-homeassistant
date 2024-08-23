@@ -85,10 +85,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     return unload_ok
 
 class GeodnetCoordinator(DataUpdateCoordinator):
-    """My custom coordinator."""
+    """Geodnet coordinator."""
 
     def __init__(self, hass, api_key, ip_address):
-        """Initialize my coordinator."""
+        """Initialize the coordinator."""
         super().__init__(
             hass,
             _LOGGER,
@@ -108,17 +108,43 @@ class GeodnetCoordinator(DataUpdateCoordinator):
                 response.raise_for_status()
                 data = await response.json()
                 
+                # Check if the response indicates bad/no data
+                if data == {"effective_satellites":0, "satInfo":[], "hourlyData":None}:
+                    _LOGGER.warning("Received bad/no data from the Geodnet API. Using default values.")
+                    return self._get_default_data()
+                
                 # Process hourly data
-                self.hourly_data = {item['timestamp']: item for item in data.get('hourlyData', [])}
+                self.hourly_data = data.get('hourlyData', [])
                 
                 return data
         except asyncio.TimeoutError as err:
             raise UpdateFailed("Timeout error") from err
+        except aiohttp.ClientResponseError as err:
+            if err.status == 401:
+                raise ConfigEntryAuthFailed("Invalid API key") from err
+            raise UpdateFailed(f"Error response from API: {err}") from err
         except (aiohttp.ClientError, aiohttp.ServerDisconnectedError) as err:
             raise UpdateFailed(f"Error while fetching data: {err}") from err
+
+    def _get_default_data(self) -> Dict[str, Any]:
+        """Return default data when the API returns bad/no data."""
+        return {
+            "total_satellites": 0,
+            "effective_satellites": 0,
+            "last_packet_time": "0",
+            "dataByte": 0,
+            "latency": 0,
+            "satInfo": [],
+            "hourlyData": []
+        }
 
     def get_current_hourly_data(self) -> Dict[str, Any]:
         """Get the most recent hourly data."""
         if not self.hourly_data:
             return {}
-        return max(self.hourly_data.values(), key=lambda x: x['timestamp'])
+        return max(self.hourly_data, key=lambda x: x['timestamp'])
+
+    async def async_close(self) -> None:
+        """Close the aiohttp ClientSession."""
+        if self.session:
+            await self.session.close()
