@@ -9,7 +9,7 @@ import voluptuous as vol
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_KEY
+from homeassistant.const import CONF_API_KEY, CONF_IP_ADDRESS
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -31,6 +31,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Geodnet from a config entry."""
     api_key = entry.data[CONF_API_KEY]
+    ip_address = entry.data[CONF_IP_ADDRESS]
     
     session = async_get_clientsession(hass)
     
@@ -42,10 +43,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         _LOGGER.error(f"Error making initial request to /api/listen: {err}")
         return False
     
-    # Wait for 5 seconds
-    await asyncio.sleep(5)
+    # Wait for 10 seconds
+    await asyncio.sleep(10)
     
-    coordinator = GeodnetCoordinator(hass, api_key)
+    coordinator = GeodnetCoordinator(hass, api_key, ip_address)
     await coordinator.async_config_entry_first_refresh()
     
     hass.data[DOMAIN][entry.entry_id] = coordinator
@@ -85,7 +86,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class GeodnetCoordinator(DataUpdateCoordinator):
     """My custom coordinator."""
 
-    def __init__(self, hass, api_key):
+    def __init__(self, hass, api_key, ip_address):
         """Initialize my coordinator."""
         super().__init__(
             hass,
@@ -94,24 +95,15 @@ class GeodnetCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=1),
         )
         self.api_key = api_key
+        self.ip_address = ip_address
         self.session = async_get_clientsession(hass)
 
-    # async def _async_update_data(self):
-    #     """Fetch data from API endpoint."""
-    #     try:
-    #         async with async_timeout.timeout(10):
-    #             response = await self.session.get(f"http://192.168.1.15:3000/api/stats?key={self.api_key}")
-    #             response.raise_for_status()
-    #             return await response.json()
-    #     except asyncio.TimeoutError as err:
-    #         raise UpdateFailed("Timeout error") from err
-    #     except (aiohttp.ClientError, aiohttp.ServerDisconnectedError) as err:
-    #         raise UpdateFailed(f"Error while fetching data: {err}") from err
+
     async def _async_update_data(self) -> Dict[str, Any]:
         """Fetch data from API endpoint."""
         try:
             async with async_timeout.timeout(10):
-                response = await self.session.get(f"http://192.168.1.15:3000/api/stats?key={self.api_key}")
+                response = await self.session.get(f"http://{self.ip_address}:3000/api/stats?key={self.api_key}")
                 response.raise_for_status()
                 data = await response.json()
                 

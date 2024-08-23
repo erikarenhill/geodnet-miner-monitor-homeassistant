@@ -1,0 +1,22 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Set up Geodnet",
+                "description": "Enter your Geodnet API key and server IP address",
+                "data": {
+                    "api_key": "API Key",
+                    "ip_address": "Server IP Address"
+                }
+            }
+        },
+        "error": {
+            "invalid_api_key_format": "Invalid API key format. It should be 5 alphanumeric characters.",
+            "invalid_ip_address_format": "Invalid IP address format.",
+            "cannot_connect": "Failed to connect to the Geodnet server"
+        },
+        "abort": {
+            "already_configured": "This Geodnet API key is already configured"
+        }
+    }
+}
