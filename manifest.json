@@ -1,0 +1,14 @@
+{
+    "domain": "geodnet",
+    "name": "Geodnet",
+    "config_flow": true,
+    "documentation": "https://www.example.com",
+    "requirements": [],
+    "ssdp": [],
+    "zeroconf": [],
+    "homekit": {},
+    "dependencies": [],
+    "codeowners": ["@erikarenhill"],
+    "iot_class": "cloud_polling",
+    "version": "0.1.0"
+}
