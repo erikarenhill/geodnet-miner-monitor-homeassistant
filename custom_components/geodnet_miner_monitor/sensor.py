@@ -57,7 +57,7 @@ class GeodnetSensor(CoordinatorEntity, SensorEntity):
         """Return the unit of measurement."""
         if self._sensor_type == "dataByte":
             return DATA_KILOBYTES
-        return None
+        return ""
 
 
 class GeodnetDataSensor(CoordinatorEntity, SensorEntity):
