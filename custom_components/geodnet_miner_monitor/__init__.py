@@ -103,8 +103,8 @@ class GeodnetCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> Dict[str, Any]:
         """Fetch data from API endpoint."""
         try:
-            async with async_timeout.timeout(10):
-                response = await self.session.get(f"{self.ip_address}/api/stats?key={self.api_key}")
+            async with async_timeout.timeout(45):
+                response = await self.session.get(f"{self.ip_address}/api/stats?key={self.api_key}&autostart=true")
                 response.raise_for_status()
                 data = await response.json()
                 
